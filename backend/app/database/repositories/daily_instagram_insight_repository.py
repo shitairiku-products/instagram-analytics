@@ -36,3 +36,22 @@ class DailyInstagramInsightRepository:
             .order_by("period")
             .all()
         )
+    
+    def get_annual_summary(self, start: date, end: date):
+        return (
+            self.db.query(
+                func.to_char(DailyInstagramInsight.date, 'YYYY-MM').label("period"),
+                func.max(DailyInstagramInsight.followers).label("followers"),
+                func.sum(DailyInstagramInsight.reach).label("reach"),
+                func.sum(DailyInstagramInsight.impressions).label("impressions"),
+                func.sum(DailyInstagramInsight.profile_visits).label("profile_visits"),
+                func.sum(DailyInstagramInsight.website_clicks).label("website_clicks")
+            )
+            .filter(
+                DailyInstagramInsight.date >= start,
+                DailyInstagramInsight.date <= end
+            )
+            .group_by("period")
+            .order_by("period")
+            .all()
+    )

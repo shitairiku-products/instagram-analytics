@@ -46,3 +46,14 @@ class EngagementByTypeResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AnnualSummaryResponse(BaseModel):
+    period: str  # e.g., "2025-04"
+    followers: int
+    reach: int
+    impressions: int
+    profile_visits: int
+    website_clicks: int
+
+    class Config:
+        from_attributes = True

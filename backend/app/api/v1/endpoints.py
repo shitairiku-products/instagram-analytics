@@ -9,6 +9,8 @@ from app.services.daily_instagram_insight_service import get_insights_by_date_ra
 from app.schemas.daily_instagram_insight_schema import EngagementByTypeResponse
 from app.services.daily_instagram_insight_service import get_engagement_by_type
 from app.schemas.daily_instagram_insight_schema import MonthlyInsightResponse
+from app.schemas.daily_instagram_insight_schema import AnnualSummaryResponse
+from app.services.daily_instagram_insight_service import get_annual_summary
 from app.database.session import get_db
 
 router = APIRouter()
@@ -57,3 +59,11 @@ def post_type_engagement(
     to_date: date = Query(..., alias="to")
 ):
     return get_engagement_by_type(db, from_date, to_date, mediatype)
+
+@router.get("/instagram/analytics/annual-summary", response_model=List[AnnualSummaryResponse])
+def annual_summary(
+    db: Session = Depends(get_db),
+    from_date: date = Query(..., alias="from"),
+    to_date: date = Query(..., alias="to")
+):
+    return get_annual_summary(db, from_date, to_date)
