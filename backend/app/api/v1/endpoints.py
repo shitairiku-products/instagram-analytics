@@ -6,7 +6,8 @@ from datetime import date, timedelta
 from app.services.instagram_account_service import list_instagram_accounts
 from app.schemas.instagram_account_schema import InstagramAccountResponse
 from app.services.daily_instagram_insight_service import get_insights_by_date_range
-from app.schemas.daily_instagram_insight_schema import DailyInstagramInsightResponse
+from app.schemas.daily_instagram_insight_schema import EngagementByTypeResponse
+from app.services.daily_instagram_insight_service import get_engagement_by_type
 from app.schemas.daily_instagram_insight_schema import MonthlyInsightResponse
 from app.database.session import get_db
 
@@ -47,3 +48,12 @@ def get_monthly_details(
     insights = get_insights_by_date_range(db, start_date, end_date)
     # Filtrar por tipo de mídia
     return [i for i in insights if i.media_type == mediatype]
+
+@router.get("/instagram/analytics/post-type-engagement", response_model=List[EngagementByTypeResponse])
+def post_type_engagement(
+    db: Session = Depends(get_db),
+    mediatype: str = Query(...),
+    from_date: date = Query(..., alias="from"),
+    to_date: date = Query(..., alias="to")
+):
+    return get_engagement_by_type(db, from_date, to_date, mediatype)
