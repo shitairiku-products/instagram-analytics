@@ -57,3 +57,15 @@ class AnnualSummaryResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class PostInsightResponse(BaseModel):
+    period: str
+    media_type: str
+    reach: int
+    likes: int
+    comments: int
+    shares: int
+    saves: int
+
+    class Config:
+        from_attributes = True
