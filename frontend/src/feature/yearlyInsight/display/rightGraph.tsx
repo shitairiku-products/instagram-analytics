@@ -13,8 +13,12 @@ const RightGraph = ({ insights }: RightGraphProps) => {
   const graphData = useMemo(() => {
     const monthlyData = aggregateMonthlyData(insights);
     return monthlyData.map(data => ({
-      ...data,
-      yearMonth: data.year_month
+      yearMonth: data.year_month,
+      likes: Number(data.likes) || 0,
+      comments: Number(data.comments) || 0,
+      shares: Number(data.shares) || 0,
+      saves: Number(data.saves) || 0,
+      impressions: Number(data.impressions) || 0
     }));
   }, [insights]);
 

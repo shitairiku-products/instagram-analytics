@@ -11,5 +11,5 @@ export async function fetchFromAPI<T>(endpoint: string): Promise<T> {
 }
 
 export async function getCompanies(): Promise<{ id: number; name: string }[]> {
-  return fetchFromAPI('/companies/');
+  return fetchFromAPI('/api/v1/instagram/accounts');
 }
