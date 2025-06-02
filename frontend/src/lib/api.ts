@@ -9,3 +9,7 @@ export async function fetchFromAPI<T>(endpoint: string): Promise<T> {
 
   return res.json();
 }
+
+export async function getCompanies(): Promise<{ id: number; name: string }[]> {
+  return fetchFromAPI('/companies/');
+}

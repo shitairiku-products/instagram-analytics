@@ -1,12 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-
-type Company = {
-  id: string;
-  name: string;
-  igId: string;
-};
+import { Company } from '@/types/company';
 
 type CompanyDropdownProps = {
   isOpen: boolean;

@@ -1,11 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-type Company = {
-  id: string;
-  name: string;
-  igId: string;
-};
+import { Company } from '@/types/company';
 
 interface CompanyState {
   selectedCompany: Company | null;

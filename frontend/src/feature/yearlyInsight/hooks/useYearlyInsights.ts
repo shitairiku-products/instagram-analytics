@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AccountInsight } from '@/types/accountInsight';
 import { useCompanyStore } from '@/components/store/companyStore';
+import { fetchFromAPI } from '@/lib/api';
 
 export const useYearlyInsights = (startDate: string, endDate: string) => {
   const [insights, setInsights] = useState<AccountInsight[]>([]);
@@ -18,15 +19,10 @@ export const useYearlyInsights = (startDate: string, endDate: string) => {
 
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `/api/yearlyInsights?companyId=${selectedCompany.id}&startDate=${startDate}&endDate=${endDate}`
+        const data = await fetchFromAPI<AccountInsight[]>(
+          `/api/v1/instagram/analytics/annual-summary?company_id=${selectedCompany.id}&from=${startDate}&to=${endDate}`
         );
 
-        if (!response.ok) {
-          throw new Error('データの取得に失敗しました');
-        }
-
-        const data = await response.json();
         setInsights(data);
         setError(null);
       } catch (err) {
@@ -40,4 +36,4 @@ export const useYearlyInsights = (startDate: string, endDate: string) => {
   }, [selectedCompany, startDate, endDate]);
 
   return { insights, isLoading, error };
-}; 
+};

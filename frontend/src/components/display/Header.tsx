@@ -8,12 +8,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import DateFilter from '../common/dateFilter';
 import { usePathname } from 'next/navigation';
+import { getCompanies } from '@/lib/api';
+import { Company } from '@/types/company';
 
-type Company = {
-  id: string;
-  name: string;
-  igId: string;
-};
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,14 +22,8 @@ export default function Header() {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const response = await fetch('/api/companies');
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setCompanies(data);
-        } else {
-          console.error('会社情報の形式が不正:', data);
-          setCompanies([]);
-        }
+        const data = await getCompanies();
+        setCompanies(data);
       } catch (error) {
         console.error('会社情報の取得に失敗:', error);
         setCompanies([]);
@@ -43,7 +34,7 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    if (!selectedCompany && Array.isArray(companies) && companies.length > 0) {
+    if (!selectedCompany && companies.length > 0) {
       setSelectedCompany(companies[0]);
     }
   }, [companies, selectedCompany, setSelectedCompany]);
@@ -56,9 +47,7 @@ export default function Header() {
     setDateRange(newStartDate, newEndDate);
   };
 
-  const isActive = (path: string) => {
-    return pathname === path;
-  };
+  const isActive = (path: string) => pathname === path;
 
   return (
     <header className="">
@@ -121,4 +110,4 @@ export default function Header() {
       </div>
     </header>
   );
-} 
+}
