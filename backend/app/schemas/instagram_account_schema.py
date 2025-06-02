@@ -12,4 +12,4 @@ class InstagramAccountResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True  # Allows conversion from SQLAlchemy to Pydantic
+        from_attributes = True

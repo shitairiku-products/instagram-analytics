@@ -51,7 +51,7 @@ def get_monthly_details(
         raise HTTPException(status_code=400, detail="Provide either 'month' or 'from' and 'to'")
 
     insights = get_insights_by_date_range(db, start_date, end_date)
-    # Filtrar por tipo de mídia
+
     return [i for i in insights if i.media_type == mediatype]
 
 @router.get("/instagram/analytics/post-type-engagement", response_model=List[EngagementByTypeResponse])
