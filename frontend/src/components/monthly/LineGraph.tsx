@@ -1,6 +1,15 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 type LineConfig = {
   key: string;
@@ -11,7 +20,7 @@ type LineConfig = {
 interface LineGraphProps {
   data: {
     date: string;
-    value: number;
+    [key: string]: number | string; // <- aqui está a correção
   }[];
   lines: LineConfig[];
   height?: string;
@@ -23,16 +32,11 @@ const LineGraph = ({ data, lines, height = '100%' }: LineGraphProps) => {
   }
 
   return (
-    <div className={`w-full bg-white`} style={{ height }}>
+    <div className="w-full bg-white" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
           <XAxis
@@ -53,11 +57,7 @@ const LineGraph = ({ data, lines, height = '100%' }: LineGraphProps) => {
             }}
             labelFormatter={(value) => `${value}日`}
           />
-          <Legend
-            wrapperStyle={{
-              paddingTop: '10px',
-            }}
-          />
+          <Legend wrapperStyle={{ paddingTop: '10px' }} />
           {lines.map((line) => (
             <Line
               key={line.key}
@@ -75,4 +75,4 @@ const LineGraph = ({ data, lines, height = '100%' }: LineGraphProps) => {
   );
 };
 
-export default LineGraph; 
+export default LineGraph;

@@ -1,9 +1,7 @@
 'use client';
 
-import { AccountInsight } from '@/types/accountInsight';
-import { useEffect, useState } from 'react';
-import { useCompanyStore } from '@/components/store/companyStore';
 import { calculateNewFollowers } from '@/components/calucurate/monthlyCalculate';
+import { useMonthlyInsights } from '../hooks/useMonthlyInsights';
 
 interface DataTableProps {
   startDate: string;
@@ -11,47 +9,9 @@ interface DataTableProps {
 }
 
 const DataTable = ({ startDate, endDate }: DataTableProps) => {
-  const [data, setData] = useState<AccountInsight[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { selectedCompany } = useCompanyStore();
+  const { insights, isLoading, error } = useMonthlyInsights(startDate, endDate, 'feed');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!selectedCompany) return;
-
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const params = new URLSearchParams({
-          companyId: selectedCompany.id,
-          startDate,
-          endDate,
-        });
-
-        const response = await fetch(`/api/accountInsights?${params}`);
-        if (!response.ok) {
-          throw new Error('データの取得に失敗しました');
-        }
-
-        const insights = await response.json();
-        setData(insights);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '予期せぬエラーが発生しました');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedCompany, startDate, endDate]);
-
-  const monthlyData = calculateNewFollowers(data, startDate, endDate);
-
-  if (!selectedCompany) {
-    return <div className="text-center py-4">企業を選択してください</div>;
-  }
+  const monthlyData = calculateNewFollowers(insights, startDate, endDate);
 
   if (isLoading) {
     return <div className="text-center py-4">データを読み込み中...</div>;
@@ -61,7 +21,7 @@ const DataTable = ({ startDate, endDate }: DataTableProps) => {
     return <div className="text-center py-4 text-red-600">{error}</div>;
   }
 
-  if (data.length === 0) {
+  if (!monthlyData.length) {
     return <div className="text-center py-4">データが見つかりませんでした</div>;
   }
 
@@ -97,4 +57,6 @@ const DataTable = ({ startDate, endDate }: DataTableProps) => {
   );
 };
 
-export default DataTable; 
+export default DataTable;
+
+
