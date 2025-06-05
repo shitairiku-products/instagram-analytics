@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { AccountInsight } from '@/types/accountInsight'; // ou outro tipo específico se necessário
+import { AccountInsight } from '@/types/accountInsight';
 import { useCompanyStore } from '@/components/store/companyStore';
 import { fetchFromAPI } from '@/lib/api';
+import { YearlyApiResponse, mapYearlyApiDataToAccountInsight } from '@/utils/transform/yearlyAdapter';
 
 export const useYearlyInsights = (startDate: string, endDate: string) => {
   const [insights, setInsights] = useState<AccountInsight[]>([]);
@@ -20,11 +21,12 @@ export const useYearlyInsights = (startDate: string, endDate: string) => {
       try {
         setIsLoading(true);
 
-        const data = await fetchFromAPI<AccountInsight[]>(
+        const data = await fetchFromAPI<YearlyApiResponse[]>(
           `/api/v1/instagram/analytics/annual-summary?from=${startDate}&to=${endDate}`
         );
 
-        setInsights(data);
+        const mapped = mapYearlyApiDataToAccountInsight(data);
+        setInsights(mapped);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
@@ -38,4 +40,3 @@ export const useYearlyInsights = (startDate: string, endDate: string) => {
 
   return { insights, isLoading, error };
 };
-
