@@ -54,6 +54,10 @@ class AnnualSummaryResponse(BaseModel):
     impressions: int
     profile_visits: int
     website_clicks: int
+    likes: int        
+    comments: int     
+    shares: int        
+    saves: int         
 
     class Config:
         from_attributes = True

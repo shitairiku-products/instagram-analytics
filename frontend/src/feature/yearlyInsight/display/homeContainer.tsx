@@ -1,27 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import DataTable from './dataTable';
 import LeftGraph from './leftGraph';
 import RightGraph from './rightGraph';
 import { useYearlyInsights } from '@/feature/yearlyInsight/hooks/useYearlyInsights';
 import { useDateStore } from '@/components/store/dateStore';
-import { useCompanyStore } from '@/components/store/companyStore';
+import { useEffect } from 'react';
 
 const HomeContainer = () => {
-  const [isClient, setIsClient] = useState(false);
   const { startDate, endDate, resetToDefault } = useDateStore();
-  const { selectedCompany } = useCompanyStore();
-
   const { insights, isLoading, error } = useYearlyInsights(startDate, endDate);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isClient) return;
-
     const today = new Date();
     const firstDayOfYear = new Date(today.getFullYear(), 0, 2);
     
@@ -29,13 +19,7 @@ const HomeContainer = () => {
       firstDayOfYear.toISOString().split('T')[0],
       today.toISOString().split('T')[0]
     );
-  }, [isClient, resetToDefault]);
-
-  if (!isClient) return null;
-
-  if (!selectedCompany) {
-    return <div className="text-center py-4">会社を選択してください</div>;
-  }
+  }, [resetToDefault]);
 
   if (error) {
     return <div className="text-red-500 p-4">{error}</div>;
@@ -47,13 +31,15 @@ const HomeContainer = () => {
         <div className="text-center py-4">データを読み込み中...</div>
       ) : (
         <>
+          {/* 上部の大きなカード */}
           <div className="p-6">
             <DataTable insights={insights} />
           </div>
 
+          {/* 下部のグリッド */}
           <div className="grid grid-cols-2 gap-6">
-            <LeftGraph insights={insights} />
-            <RightGraph insights={insights} />
+              <LeftGraph insights={insights} />
+              <RightGraph insights={insights} />
           </div>
         </>
       )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AccountInsight } from '@/types/accountInsight';
+import { AccountInsight } from '@/types/accountInsight'; // ou outro tipo específico se necessário
 import { useCompanyStore } from '@/components/store/companyStore';
 import { fetchFromAPI } from '@/lib/api';
 
@@ -19,8 +19,9 @@ export const useYearlyInsights = (startDate: string, endDate: string) => {
 
       try {
         setIsLoading(true);
+
         const data = await fetchFromAPI<AccountInsight[]>(
-          `/api/v1/instagram/analytics/annual-summary?company_id=${selectedCompany.id}&from=${startDate}&to=${endDate}`
+          `/api/v1/instagram/analytics/annual-summary?from=${startDate}&to=${endDate}`
         );
 
         setInsights(data);
@@ -37,3 +38,4 @@ export const useYearlyInsights = (startDate: string, endDate: string) => {
 
   return { insights, isLoading, error };
 };
+

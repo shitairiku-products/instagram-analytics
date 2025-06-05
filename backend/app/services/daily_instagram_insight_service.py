@@ -37,7 +37,11 @@ def get_annual_summary(db: Session, start: date, end: date) -> List[AnnualSummar
             reach=row.reach,
             impressions=row.impressions,
             profile_visits=row.profile_visits,
-            website_clicks=row.website_clicks
+            website_clicks=row.website_clicks,
+            likes=row.likes,
+            comments=row.comments,
+            shares=row.shares,
+            saves=row.saves,
         )
         for row in results
     ]

@@ -45,7 +45,11 @@ class DailyInstagramInsightRepository:
                 func.sum(DailyInstagramInsight.reach).label("reach"),
                 func.sum(DailyInstagramInsight.impressions).label("impressions"),
                 func.sum(DailyInstagramInsight.profile_visits).label("profile_visits"),
-                func.sum(DailyInstagramInsight.website_clicks).label("website_clicks")
+                func.sum(DailyInstagramInsight.website_clicks).label("website_clicks"),
+                func.sum(DailyInstagramInsight.likes).label("likes"),
+                func.sum(DailyInstagramInsight.comments).label("comments"),
+                func.sum(DailyInstagramInsight.shares).label("shares"),
+                func.sum(DailyInstagramInsight.saves).label("saves")
             )
             .filter(
                 DailyInstagramInsight.date >= start,
@@ -54,4 +58,4 @@ class DailyInstagramInsightRepository:
             .group_by("period")
             .order_by("period")
             .all()
-    )
+        )
