@@ -1,8 +1,8 @@
 'use client';
 
-import { PostInsight } from '@/types/post';
+import { useMonthlyMaster } from '@/feature/monthlyMaster/hooks/useMonthlyMaster';
+import { useCompanyStore } from '@/components/store/companyStore';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useEffect, useState } from 'react';
 
 interface GraphProps {
   companyId: string;
@@ -11,40 +11,13 @@ interface GraphProps {
   selectedTypes: string[];
 }
 
-const Graph = ({ companyId, startDate, endDate, selectedTypes }: GraphProps) => {
-  const [data, setData] = useState<PostInsight[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const Graph = ({ startDate = '', endDate = '' }: GraphProps) => {
+  const { selectedCompany } = useCompanyStore();
+  const { insights, isLoading, error } = useMonthlyMaster(startDate, endDate);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const params = new URLSearchParams({ 
-          companyId,
-          types: selectedTypes.join(',')
-        });
-        if (startDate) params.append('startDate', startDate);
-        if (endDate) params.append('endDate', endDate);
-
-        const response = await fetch(`/api/posts?${params}`);
-        if (!response.ok) {
-          throw new Error('データの取得に失敗しました');
-        }
-
-        const posts = await response.json();
-        setData(posts);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '予期せぬエラーが発生しました');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [companyId, startDate, endDate, selectedTypes]);
+  if (!selectedCompany) {
+    return <div className="text-center py-4">企業を選択してください</div>;
+  }
 
   if (isLoading) {
     return <div className="text-center py-4">グラフデータを読み込み中...</div>;
@@ -54,23 +27,23 @@ const Graph = ({ companyId, startDate, endDate, selectedTypes }: GraphProps) => 
     return <div className="text-center py-4 text-red-600">{error}</div>;
   }
 
-  if (data.length === 0) {
+  if (insights.length === 0) {
     return <div className="text-center py-4">データが見つかりませんでした</div>;
   }
 
-  const sortedData = [...data].sort((a, b) => 
-    new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-  );
+  const chartData = insights.map(item => {
+    const engagement =
+      item.reachTotal > 0
+        ? ((item.likesTotal + item.commentsTotal + item.savesTotal + item.sharesTotal) / item.reachTotal * 100).toFixed(2)
+        : '0';
 
-  const chartData = sortedData.map(post => {
-    const engagement = post.reach ? ((post.likes + post.comments + post.saved + post.shares) / post.reach * 100).toFixed(2) : '0';
     return {
-      date: new Date(post.timestamp).toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' }),
+      date: item.date.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit' }),
       エンゲージメント率: Number(engagement),
-      いいね: post.likes,
-      コメント: post.comments,
-      保存: post.saved,
-      シェア: post.shares,
+      いいね: item.likesTotal,
+      コメント: item.commentsTotal,
+      保存: item.savesTotal,
+      シェア: item.sharesTotal,
     };
   });
 
@@ -79,30 +52,13 @@ const Graph = ({ companyId, startDate, endDate, selectedTypes }: GraphProps) => 
       <ResponsiveContainer>
         <ComposedChart
           data={chartData}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
+          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
-          <YAxis 
-            yAxisId="left"
-            orientation="left"
-            domain={[0, 30]}
-          />
-          <YAxis
-            yAxisId="right"
-            orientation="right"
-            domain={[0, 'auto']}
-            tickFormatter={(value) => `${value}%`}
-          />
-          <Tooltip formatter={(value, name) => [
-            name === 'エンゲージメント率' ? `${value}%` : value,
-            name
-          ]}/>
+          <YAxis yAxisId="left" orientation="left" domain={[0, 'auto']} />
+          <YAxis yAxisId="right" orientation="right" domain={[0, 'auto']} tickFormatter={(v) => `${v}%`} />
+          <Tooltip formatter={(value, name) => [name === 'エンゲージメント率' ? `${value}%` : value, name]} />
           <Legend />
           <Bar dataKey="いいね" stackId="a" fill="#E5E7EB" yAxisId="left" />
           <Bar dataKey="コメント" stackId="a" fill="#93C5FD" yAxisId="left" />
@@ -122,4 +78,4 @@ const Graph = ({ companyId, startDate, endDate, selectedTypes }: GraphProps) => 
   );
 };
 
-export default Graph; 
+export default Graph;

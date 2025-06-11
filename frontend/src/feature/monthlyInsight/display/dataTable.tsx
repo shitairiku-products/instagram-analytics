@@ -58,5 +58,3 @@ const DataTable = ({ startDate, endDate }: DataTableProps) => {
 };
 
 export default DataTable;
-
-
